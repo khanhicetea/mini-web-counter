@@ -3,10 +3,10 @@ const util = require('util');
 const cookieParser = require('cookie-parser');
 const redis = require('redis');
 const redisOptions = {
-	host: process.env.REDIS_HOST,
-	port: process.env.REDIS_PORT,
+	host: process.env.REDIS_HOST || '127.0.0.1',
+	port: process.env.REDIS_PORT || '6379',
 };
-const redisClient = redis.createClient();
+const redisClient = redis.createClient(redisOptions);
 const ONLINE_WINDOW = 5000;
 const HTTP_PORT = process.env.HTTP_PORT || 3000;
 
