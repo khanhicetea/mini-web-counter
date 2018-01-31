@@ -1,0 +1,25 @@
+{
+  "name": "mini-web-counter",
+  "version": "1.0.0",
+  "description": "Mini Web Counter",
+  "main": "main.js",
+  "dependencies": {
+    "cookie-parser": "^1.4.3",
+    "polka": "^0.3",
+    "redis": "^2.8.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/khanhicetea/mini-web-counter.git"
+  },
+  "author": "KhanhIceTea",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/khanhicetea/mini-web-counter/issues"
+  },
+  "homepage": "https://github.com/khanhicetea/mini-web-counter#readme"
+}
