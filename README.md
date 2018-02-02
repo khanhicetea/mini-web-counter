@@ -9,12 +9,26 @@ $ yarn
 $ node main.js
 ```
 
+## Environments
+
+- `REDIS_HOST` : redis hostname (127.0.0.1)
+- `REDIS_PORT` : redis port (6379)
+- `HMAC_SECRET` : hmac md5 algo secret
+- `ONLINE_WINDOW` : window time period of online users
+- `HTTP_PORT` : http server port
+
 ## How to use
 
 ```js
-$.getJSON("http://[your-web-counter]/hit/[webid-number]", function( data ) {
+$.getJSON("http://[your-web-counter]/hit/[webid-number]/[hmac-signature]", function( data ) {
 	console.log(data);
 	// Use data to render to UI
 });
 ```
+
+## LICENSE
+
+The MIT License (MIT)
+
+Copyright (c) 2018 Khanh Nguyen
 
