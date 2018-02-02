@@ -1,5 +1,6 @@
 const polka = require('polka');
 const util = require('util');
+const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 const redis = require('redis');
 const redisOptions = {
@@ -7,7 +8,8 @@ const redisOptions = {
 	port: process.env.REDIS_PORT || '6379',
 };
 const redisClient = redis.createClient(redisOptions);
-const ONLINE_WINDOW = 5000;
+const secretKey = process.env.HMAC_SECRET || '';
+const ONLINE_WINDOW = process.env.ONLINE_WINDOW || 5000;
 const HTTP_PORT = process.env.HTTP_PORT || 3000;
 
 polka()
@@ -15,8 +17,16 @@ polka()
 .get('/health', (req, res) => {
 	res.end('Hello world');
 })
-.get('/hit/:webid', (req, res) => {
+.get('/hit/:webid/:sign', (req, res) => {
 	const webid = req.params.webid || 0;
+	const sign = req.params.sign || '';
+    const hmac = crypto.createHmac('md5', secretKey);
+
+    if (sign != hmac.update(webid.toString()).digest('hex')) {
+        res.statusCode = 400;
+        return res.end('');
+    }
+
 	const sid = req.cookies.sid || null;
 	const now = new Date();
 	const date = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDay();
