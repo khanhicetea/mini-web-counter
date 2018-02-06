@@ -28,18 +28,20 @@ polka()
     }
 
 	const sid = req.cookies.sid || null;
-	const now = new Date();
-	const date = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDay();
-	const keys = [
-		util.format('web%d:all:hit', webid),
-		util.format('web%d:%s:hit', webid, date),
-		util.format('web%d:%d:online', webid, parseInt(now.getTime() / ONLINE_WINDOW)),
-	];
 	const multi = redisClient.multi();
+	const now = new Date();
+	const date = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
+	const keys = {
+		all_hits: util.format('web%d:all:hit', webid),
+		today_hits: util.format('web%d:%s:hit', webid, date),
+		online: util.format('web%d:%d:online', webid, parseInt(now.getTime() / ONLINE_WINDOW)),
+		all_visits: util.format('web%d:all:visit', webid),
+		today_visits: util.format('web%d:%s:visit', webid, date),
+	}
 
-	keys.forEach(function(key) {
-		multi.incr(key);
-	});
+	multi.incr(keys.all_hits);
+	multi.incr(keys.today_hits);
+	multi.incr(keys.online);
 
 	if (sid) {
 		multi.get(util.format('web%d:all:visit', webid));
@@ -50,7 +52,12 @@ polka()
 		res.setHeader('Set-Cookie', ['sid=' + now.getTime()]);
 	}
 
+	multi.expire(keys.today_hits, 86400);
+	multi.expire(keys.online, parseInt(now / 1000 + ONLINE_WINDOW));
+	multi.expire(keys.today_visits, 86400);
+
 	multi.exec(function(err, replies) {
+		console.log(replies);
 		const data = {
 			all_hits: parseInt(replies[0] || 0),
 			today_hits: parseInt(replies[1] || 0),
