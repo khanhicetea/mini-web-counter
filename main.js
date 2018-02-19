@@ -44,11 +44,11 @@ polka()
 	multi.incr(keys.online);
 
 	if (sid) {
-		multi.get(util.format('web%d:all:visit', webid));
-		multi.get(util.format('web%d:%s:visit', webid, date));
+		multi.get(keys.all_visits);
+		multi.get(keys.today_visits);
 	} else {
-		multi.incr(util.format('web%d:all:visit', webid));
-		multi.incr(util.format('web%d:%s:visit', webid, date));
+		multi.incr(keys.all_visits);
+		multi.incr(keys.today_visits);
 		res.setHeader('Set-Cookie', ['sid=' + now.getTime()]);
 	}
 
@@ -57,7 +57,6 @@ polka()
 	multi.expire(keys.today_visits, 86400);
 
 	multi.exec(function(err, replies) {
-		console.log(replies);
 		const data = {
 			all_hits: parseInt(replies[0] || 0),
 			today_hits: parseInt(replies[1] || 0),
@@ -71,5 +70,5 @@ polka()
 })
 .listen(HTTP_PORT)
 .then(() => {
-	console.log("> Running on port 3000 !");
+	console.log("> Running on port "+HTTP_PORT+" !");
 })
