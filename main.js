@@ -41,12 +41,13 @@ polka()
 
 	multi.incr(keys.all_hits);
 	multi.incr(keys.today_hits);
-	multi.incr(keys.online);
 
 	if (sid) {
+		multi.get(keys.online);
 		multi.get(keys.all_visits);
 		multi.get(keys.today_visits);
 	} else {
+	    multi.incr(keys.online);
 		multi.incr(keys.all_visits);
 		multi.incr(keys.today_visits);
 		res.setHeader('Set-Cookie', ['sid=' + now.getTime()]);
