@@ -9,7 +9,7 @@ const redisOptions = {
 };
 const redisClient = redis.createClient(redisOptions);
 const secretKey = process.env.HMAC_SECRET || '';
-const ONLINE_WINDOW = process.env.ONLINE_WINDOW || 5000;
+const ONLINE_WINDOW = process.env.ONLINE_WINDOW || 5;
 const HTTP_PORT = process.env.HTTP_PORT || 3000;
 
 polka()
@@ -30,11 +30,12 @@ polka()
 	const sid = req.cookies.sid || null;
 	const multi = redisClient.multi();
 	const now = new Date();
+	const ts = parseInt(now / 1000);
 	const date = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
 	const keys = {
 		all_hits: util.format('web%d:all:hit', webid),
 		today_hits: util.format('web%d:%s:hit', webid, date),
-		online: util.format('web%d:%d:online', webid, parseInt(now.getTime() / ONLINE_WINDOW)),
+		online: util.format('web%d:%d:online', webid, parseInt(ts / ONLINE_WINDOW)),
 		all_visits: util.format('web%d:all:visit', webid),
 		today_visits: util.format('web%d:%s:visit', webid, date),
 	}
@@ -50,7 +51,9 @@ polka()
 	    multi.incr(keys.online);
 		multi.incr(keys.all_visits);
 		multi.incr(keys.today_visits);
-		res.setHeader('Set-Cookie', ['sid=' + now.getTime()]);
+        const expire_ts = (parseInt(ts / ONLINE_WINDOW) + 1 ) * ONLINE_WINDOW * 1000;
+        const expire = (new Date(expire_ts)).toGMTString();
+		res.setHeader('Set-Cookie', ['sid=' + ts + '; expires=' + expire]);
 	}
 
 	multi.expire(keys.today_hits, 86400);
