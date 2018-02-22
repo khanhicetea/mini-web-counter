@@ -14,6 +14,12 @@ const HTTP_PORT = process.env.HTTP_PORT || 3000;
 
 polka()
 .use(cookieParser())
+.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', [req.headers.origin]);
+    res.setHeader('Access-Control-Allow-Credentials', ['true']);
+    res.setHeader('Access-Control-Allow-Headers', ['DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type']);
+    next();
+})
 .get('/health', (req, res) => {
     res.end('Hello world');
 })
@@ -57,7 +63,7 @@ polka()
     }
 
     multi.expire(keys.today_hits, 86400);
-    multi.expire(keys.online, parseInt(now / 1000 + ONLINE_WINDOW));
+    multi.expire(keys.online, ts + ONLINE_WINDOW);
     multi.expire(keys.today_visits, 86400);
 
     multi.exec(function(err, replies) {
