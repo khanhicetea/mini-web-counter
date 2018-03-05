@@ -5,6 +5,8 @@
   "main": "main.js",
   "dependencies": {
     "cookie-parser": "^1.4.3",
+    "cron": "^1.3.0",
+    "mysql": "^2.15.0",
     "polka": "^0.3",
     "redis": "^2.8.0"
   },

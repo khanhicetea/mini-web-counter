@@ -3,6 +3,9 @@ const util = require('util');
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 const redis = require('redis');
+var moment = require('moment');
+const CronJob = require('cron').CronJob;
+const webServer = require('./web-server');
 const redisOptions = {
     host: process.env.REDIS_HOST || '127.0.0.1',
     port: process.env.REDIS_PORT || '6379',
@@ -11,6 +14,10 @@ const redisClient = redis.createClient(redisOptions);
 const secretKey = process.env.HMAC_SECRET || '';
 const ONLINE_WINDOW = process.env.ONLINE_WINDOW || 5;
 const HTTP_PORT = process.env.HTTP_PORT || 3000;
+
+new CronJob('00 00 3 * * *', function () {
+    webServer.backupCounter(redisClient);
+}, null, true, 'Asia/Ho_Chi_Minh');
 
 polka()
 .use(cookieParser())
@@ -32,6 +39,15 @@ polka()
         res.statusCode = 400;
         return res.end('');
     }
+
+    redisClient.get("day_counter", function (err, reply) {
+        if (err) {
+            throw err;
+        }
+        var day_counter = reply ? JSON.parse(reply) : {};
+        day_counter[webid] = true;
+        redisClient.set('day_counter', JSON.stringify(day_counter));
+    });
 
     const sid = req.cookies.sid || null;
     const multi = redisClient.multi();
@@ -76,6 +92,40 @@ polka()
         };
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(data));
+    });
+})
+.get('/record/:webid/:begindate/:enddate/:sign', (req, res) => {
+    const webid = req.params.webid || 0;
+    const sign = req.params.sign || '';
+    const hmac = crypto.createHmac('md5', secretKey);
+
+    if (sign != hmac.update(webid.toString()).digest('hex')) {
+        res.statusCode = 400;
+        return res.end('');
+    }
+    const begindate = req.params.begindate || '';
+    const enddate = req.params.enddate || '';
+
+    var connection = webServer.makeConnection();
+    connection.connect(function (err) {
+        if (err) {
+            console.error('error connecting: ' + err.stack);
+            return;
+        }
+        console.log('connected as id ' + connection.threadId);
+        connection.query('SELECT * FROM `counter` WHERE (`web_id` = ?) AND (`created_at` BETWEEN ? AND ?)', [webid, begindate, enddate], function (error, results, fields) {
+            if (error) throw error;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(results));
+            connection.end(function (err) {
+                if (err) {
+                    console.error('error end connecting: ' + err.stack);
+                    return;
+                }
+
+                console.log('connection is closed');
+            });
+        });
     });
 })
 .listen(HTTP_PORT)
