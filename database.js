@@ -1,5 +1,5 @@
-var mysql = require('mysql');
-var moment = require('moment');
+const mysql = require('mysql');
+const moment = require('moment');
 const util = require('util');
 
 function makeConnection() {
@@ -12,7 +12,7 @@ function makeConnection() {
 }
 
 function backupCounter(redisClient) {
-    var connection = makeConnection();
+    const connection = makeConnection();
     connection.connect(function (err) {
         if (err) {
             console.error('error connecting: ' + err.stack);
@@ -22,9 +22,9 @@ function backupCounter(redisClient) {
         console.log('connected as id ' + connection.threadId);
         connection.beginTransaction(function (err) {
             if (err) { throw err; }
-            redisClient.get("day_counter", function (err, reply) {
-                var day_counter = JSON.parse(reply);
-                Object.keys(day_counter).forEach(function (webid) {
+            const multi = redisClient.multi();
+            multi.scard("day_counter").smembers("day_counter").exec(function (err, replies) {
+                replies[1].forEach(function (webid) {
                     const multi = redisClient.multi();
                     const now = new Date();
                     const date = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
@@ -38,6 +38,7 @@ function backupCounter(redisClient) {
                     multi.get(keys.today_hits);
                     multi.get(keys.all_visits);
                     multi.get(keys.today_visits);
+                    multi.srem('day_counter', webid);
                     multi.exec(function (err, replies) {
                         var data_web_counter = {
                             all_hits: parseInt(replies[0] || 0),
@@ -62,7 +63,6 @@ function backupCounter(redisClient) {
                             throw err;
                         });
                     }
-                    redisClient.set('day_counter', JSON.stringify({}));
                     connection.end(function (err) {
                         if (err) {
                             console.error('error end connecting: ' + err.stack);
@@ -77,9 +77,9 @@ function backupCounter(redisClient) {
     });
 }
 
-const WEB_SERVER = {
+const DATABASE = {
     backupCounter: backupCounter,
     makeConnection: makeConnection,
 }
 
-module.exports = WEB_SERVER
+module.exports = DATABASE

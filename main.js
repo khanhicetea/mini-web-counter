@@ -3,9 +3,9 @@ const util = require('util');
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 const redis = require('redis');
-var moment = require('moment');
+const moment = require('moment');
 const CronJob = require('cron').CronJob;
-const webServer = require('./web-server');
+const database = require('./database');
 const redisOptions = {
     host: process.env.REDIS_HOST || '127.0.0.1',
     port: process.env.REDIS_PORT || '6379',
@@ -14,10 +14,11 @@ const redisClient = redis.createClient(redisOptions);
 const secretKey = process.env.HMAC_SECRET || '';
 const ONLINE_WINDOW = process.env.ONLINE_WINDOW || 5;
 const HTTP_PORT = process.env.HTTP_PORT || 3000;
+const TIME_ZONE = process.env.TIME_ZONE || 'Asia/Ho_Chi_Minh';
 
 new CronJob('00 00 3 * * *', function () {
-    webServer.backupCounter(redisClient);
-}, null, true, 'Asia/Ho_Chi_Minh');
+    database.backupCounter(redisClient);
+}, null, true, TIME_ZONE);
 
 polka()
 .use(cookieParser())
@@ -39,15 +40,7 @@ polka()
         res.statusCode = 400;
         return res.end('');
     }
-
-    redisClient.get("day_counter", function (err, reply) {
-        if (err) {
-            throw err;
-        }
-        var day_counter = reply ? JSON.parse(reply) : {};
-        day_counter[webid] = true;
-        redisClient.set('day_counter', JSON.stringify(day_counter));
-    });
+    redisClient.sadd('day_counter', webid.toString());
 
     const sid = req.cookies.sid || null;
     const multi = redisClient.multi();
@@ -106,7 +99,7 @@ polka()
     const begindate = req.params.begindate || '';
     const enddate = req.params.enddate || '';
 
-    var connection = webServer.makeConnection();
+    const connection = database.makeConnection();
     connection.connect(function (err) {
         if (err) {
             console.error('error connecting: ' + err.stack);
