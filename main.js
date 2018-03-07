@@ -12,11 +12,11 @@ const redisOptions = {
 };
 const redisClient = redis.createClient(redisOptions);
 const secretKey = process.env.HMAC_SECRET || '';
-const ONLINE_WINDOW = process.env.ONLINE_WINDOW || 5;
+const ONLINE_WINDOW = process.env.ONLINE_WINDOW || 60;
 const HTTP_PORT = process.env.HTTP_PORT || 3000;
 const TIME_ZONE = process.env.TIME_ZONE || 'Asia/Ho_Chi_Minh';
 
-new CronJob('00 00 3 * * *', function () {
+new CronJob('01 00 00 * * *', function () {
     database.backupCounter(redisClient);
 }, null, true, TIME_ZONE);
 
@@ -44,9 +44,9 @@ polka()
 
     const sid = req.cookies.sid || null;
     const multi = redisClient.multi();
-    const now = new Date();
+    const now = moment();
     const ts = parseInt(now / 1000);
-    const date = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
+    const date = now.format('YYYY-MM-DD');
     const keys = {
         all_hits: util.format('web%d:all:hit', webid),
         today_hits: util.format('web%d:%s:hit', webid, date),

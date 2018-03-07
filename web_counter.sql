@@ -7,7 +7,7 @@
 #
 # Host: 127.0.0.1 (MySQL 5.7.18)
 # Database: web_counter
-# Generation Time: 2018-03-06 03:03:13 +0000
+# Generation Time: 2018-03-07 09:29:27 +0000
 # ************************************************************
 
 
@@ -26,14 +26,13 @@
 DROP TABLE IF EXISTS `counter`;
 
 CREATE TABLE `counter` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `web_id` int(11) DEFAULT NULL,
+  `web_id` int(11) NOT NULL,
   `all_hits` int(11) DEFAULT NULL,
   `today_hits` int(11) DEFAULT NULL,
   `all_visits` int(11) DEFAULT NULL,
   `today_visits` int(11) DEFAULT NULL,
-  `created_at` date DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `created_at` date NOT NULL,
+  PRIMARY KEY (`web_id`,`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
