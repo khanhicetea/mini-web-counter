@@ -123,5 +123,34 @@ polka()
 })
 .listen(HTTP_PORT)
 .then(() => {
+    const connection = database.makeConnection();
+    connection.connect(function (err) {
+        if (err) {
+            console.error('error connecting: ' + err.stack);
+            return;
+        }
+        console.log('connected as id ' + connection.threadId);
+        connection.query('SELECT * FROM `backup`', function (error, results, fields) {
+            const multi = redisClient.multi();
+            results.forEach(function(web_data) {
+                multi.set(util.format('web%d:all:hit', web_data.web_id), web_data.all_hits);
+                multi.set(util.format('web%d:all:visit', web_data.web_id), web_data.all_visits);
+            })
+            multi.exec(function (err, replies) {
+                if (err) {
+                    console.error('error set redis backup data: ' + err.stack);
+                    return;
+                }
+                connection.end(function (err) {
+                    if (err) {
+                        console.error('error end connecting: ' + err.stack);
+                        return;
+                    }
+
+                    console.log('connection is closed');
+                });
+            });
+        });
+    });
     console.log("> Running on port "+HTTP_PORT+" !");
 })

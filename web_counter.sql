@@ -7,7 +7,7 @@
 #
 # Host: 127.0.0.1 (MySQL 5.7.18)
 # Database: web_counter
-# Generation Time: 2018-03-07 09:29:27 +0000
+# Generation Time: 2018-03-14 10:27:22 +0000
 # ************************************************************
 
 
@@ -18,6 +18,20 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+
+# Dump of table backup
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `backup`;
+
+CREATE TABLE `backup` (
+  `web_id` int(11) unsigned NOT NULL,
+  `all_hits` int(11) DEFAULT NULL,
+  `all_visits` int(11) DEFAULT NULL,
+  PRIMARY KEY (`web_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 
 # Dump of table counter
