@@ -40,7 +40,6 @@ polka()
         res.statusCode = 400;
         return res.end('');
     }
-    redisClient.sadd('day_counter', webid.toString());
 
     const sid = req.cookies.sid || null;
     const multi = redisClient.multi();
@@ -74,7 +73,8 @@ polka()
     multi.expire(keys.today_hits, 86400);
     multi.expire(keys.online, ts + ONLINE_WINDOW);
     multi.expire(keys.today_visits, 86400);
-
+    multi.sadd('day_counter', webid.toString());
+    
     multi.exec(function(err, replies) {
         const data = {
             all_hits: parseInt(replies[0] || 0),
