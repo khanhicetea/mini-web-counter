@@ -55,14 +55,14 @@ function backupCounterData(redisClient, mysqlConnection) {
                         all_visits: data_web_counter.all_visits,
                     }
 
-                    mysqlConnection.query('INSERT IGNORE INTO `counter` SET ?', data_web_counter, function (error, results, fields) {
+                    mysqlConnection.query('INSERT IGNORE INTO `website_histories` SET ?', data_web_counter, function (error, results, fields) {
                         if (error) {
                             console.log(error);
                             throw error;
                         }
                     });
 
-                    mysqlConnection.query('INSERT INTO `backup` SET ? ON DUPLICATE KEY UPDATE ?', [data_backup, data_backup], function (error, results, fields) {
+                    mysqlConnection.query('INSERT INTO `website_stats` SET ? ON DUPLICATE KEY UPDATE ?', [data_backup, data_backup], function (error, results, fields) {
                         if (error) {
                             console.log(error);
                             throw error;

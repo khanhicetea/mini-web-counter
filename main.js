@@ -119,7 +119,7 @@ polka()
     mysqlPool.getConnection(function(err, connection) {
         if (err) throw err;
 
-        connection.query('SELECT * FROM `counter` WHERE (`web_id` = ?) AND (`created_at` BETWEEN ? AND ?)', [webid, begindate, enddate], function (error, results, fields) {
+        connection.query('SELECT * FROM `website_histories` WHERE (`web_id` = ?) AND (`created_at` BETWEEN ? AND ?)', [webid, begindate, enddate], function (error, results, fields) {
             connection.release();            
             if (error) throw error;
 
@@ -133,7 +133,7 @@ polka()
     mysqlPool.getConnection(function(err, connection) {
         if (err) throw err;
 
-        connection.query('SELECT * FROM `backup`', function (error, results, fields) {
+        connection.query('SELECT * FROM `website_stats`', function (error, results, fields) {
             connection.release();            
             if (error) throw error;
 

@@ -20,12 +20,12 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
-# Dump of table backup
+# Dump of table website_stats
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `backup`;
+DROP TABLE IF EXISTS `website_stats`;
 
-CREATE TABLE `backup` (
+CREATE TABLE `website_stats` (
   `web_id` int(11) unsigned NOT NULL,
   `all_hits` int(11) DEFAULT NULL,
   `all_visits` int(11) DEFAULT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE `backup` (
 # Dump of table counter
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `counter`;
+DROP TABLE IF EXISTS `website_histories`;
 
 CREATE TABLE `counter` (
   `web_id` int(11) NOT NULL,
