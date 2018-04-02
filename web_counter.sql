@@ -39,7 +39,7 @@ CREATE TABLE `website_stats` (
 
 DROP TABLE IF EXISTS `website_histories`;
 
-CREATE TABLE `counter` (
+CREATE TABLE `website_histories` (
   `web_id` int(11) NOT NULL,
   `all_hits` int(11) DEFAULT NULL,
   `today_hits` int(11) DEFAULT NULL,
