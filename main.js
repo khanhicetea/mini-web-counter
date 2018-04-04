@@ -3,7 +3,7 @@ const util = require('util');
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 const redis = require('redis');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const cronJob = require('cron').CronJob;
 const database = require('./database');
 const redisOptions = {
@@ -20,13 +20,15 @@ const cron = new cronJob('01 00 00 * * *', function () {
     console.log("> Backup [ " + moment().format('YYYY-MM-DD') + " ] data from redis to database ...");
     mysqlPool.getConnection(function(err, connection) {
         if (err) throw err;
-        database.backupCounterData(redisClient, connection);
+        database.backupCounterData(redisClient, connection, TIME_ZONE);
     });
 }, null, true, TIME_ZONE);
 const checkSignature = function(webid, sign, secret) {
     const hmac = crypto.createHmac('md5', secret);
     return sign != hmac.update(webid.toString()).digest('hex');
 };
+
+moment.tz.setDefault(TIME_ZONE);
 
 polka()
 .use(cookieParser())

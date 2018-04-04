@@ -1,5 +1,5 @@
 const mysql = require('mysql');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const util = require('util');
 
 function createPoolingConnections() {
@@ -12,8 +12,8 @@ function createPoolingConnections() {
     });
 }
 
-function backupCounterData(redisClient, mysqlConnection) {
-    const today = moment().subtract(1, "days").format('YYYY-MM-DD');
+function backupCounterData(redisClient, mysqlConnection, timeZone) {
+    const today = moment().tz(timeZone).subtract(1, "days").format('YYYY-MM-DD');
 
     redisClient.smembers("day_counter", function (err, replies) {
         if (err) throw err;
