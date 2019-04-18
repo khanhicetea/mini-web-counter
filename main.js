@@ -32,15 +32,22 @@ moment.tz.setDefault(TIME_ZONE);
 
 polka()
 .use(cookieParser())
-.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', [req.headers.origin]);
-    res.setHeader('Access-Control-Allow-Credentials', ['true']);
-    res.setHeader('Access-Control-Allow-Headers', ['DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type']);
-    if ('OPTIONS' === req.method) {
-        res.send(200);
-    } else {        
-        next();
-    }
+// .use((req, res, next) => {
+//     res.setHeader('Access-Control-Allow-Origin', [req.headers.origin]);
+//     res.setHeader('Access-Control-Allow-Credentials', ['true']);
+//     res.setHeader('Access-Control-Allow-Headers', ['DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type']);
+//     if ('OPTIONS' === req.method) {
+//         res.send(200);
+//     } else {        
+//         next();
+//     }
+// })
+.options("/*", function(req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', [req.headers.origin]);
+  res.setHeader('Access-Control-Allow-Credentials', ['true']);
+  res.setHeader('Access-Control-Allow-Headers', ['DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type']);
+  res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.send(200);
 })
 .get('/health', (req, res) => {
     res.end('Hello world');
