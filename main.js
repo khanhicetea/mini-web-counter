@@ -36,7 +36,11 @@ polka()
     res.setHeader('Access-Control-Allow-Origin', [req.headers.origin]);
     res.setHeader('Access-Control-Allow-Credentials', ['true']);
     res.setHeader('Access-Control-Allow-Headers', ['DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type']);
-    next();
+    if ('OPTIONS' === req.method) {
+        res.send(200);
+    } else {        
+        next();
+    }
 })
 .get('/health', (req, res) => {
     res.end('Hello world');
