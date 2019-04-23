@@ -25,6 +25,17 @@ $.getJSON("http://[your-web-counter]/hit/[webid-number]/[hmac-signature]", funct
 	// Use data to render to UI
 });
 ```
+Or
+```js
+$.ajax({
+	url: "http://[your-web-counter]/hit/[webid-number]/[hmac-signature]",
+	dataType: "jsonp",
+	jsonpCallback: "[callback_function_name]",
+}, function( data ) {
+	console.log(data);
+	// Use data to render to UI
+});
+```
 
 ## LICENSE
 
