@@ -114,7 +114,7 @@ polka()
             today_visits: parseInt(replies[4] || 0),
         };
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify(data));
+        res.end('callbackResults('+JSON.stringify(data)+')');
     });
 })
 .get('/stats/:webid/:begindate/:enddate/:sign', (req, res) => {
@@ -137,7 +137,7 @@ polka()
             if (error) throw error;
 
             res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(results));
+            res.end('callbackResults('+JSON.stringify(results)+')');
         });
     });
 })
