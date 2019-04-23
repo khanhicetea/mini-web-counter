@@ -23,7 +23,7 @@ $ node main.js
 $.ajax({
 	url: "http://[your-web-counter]/hit/[webid-number]/[hmac-signature]",
 	dataType: "jsonp",
-	jsonpCallback: "callbackResults",
+	jsonpCallback: "[callback_function_name]",
 }, function( data ) {
 	console.log(data);
 	// Use data to render to UI

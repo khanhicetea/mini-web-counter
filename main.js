@@ -52,9 +52,10 @@ polka()
 .get('/health', (req, res) => {
     res.end('Hello world');
 })
-.get('/hit/:webid/:sign', (req, res) => {
+.get('/hit/:webid/:sign?callback=:callback', (req, res) => {
     const webid = req.params.webid || 0;
     const sign = req.params.sign || '';
+    const callback = req.query.callback || 'callbackResults';
 
     if (checkSignature(webid, sign, secretKey)) {
         res.statusCode = 400;
@@ -114,7 +115,7 @@ polka()
             today_visits: parseInt(replies[4] || 0),
         };
         res.setHeader('Content-Type', 'application/json');
-        res.end('callbackResults('+JSON.stringify(data)+')');
+        res.end(`${callback}(${JSON.stringify(data)})`);
     });
 })
 .get('/stats/:webid/:begindate/:enddate/:sign', (req, res) => {
@@ -137,7 +138,7 @@ polka()
             if (error) throw error;
 
             res.setHeader('Content-Type', 'application/json');
-            res.end('callbackResults('+JSON.stringify(results)+')');
+            res.end(JSON.stringify(results));
         });
     });
 })
